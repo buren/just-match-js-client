@@ -1,3 +1,5 @@
+'use strict';
+
 var JsonApiDataStore = require('jsonapi-datastore').JsonApiDataStore;
 
 var Store = function() {

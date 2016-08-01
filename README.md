@@ -2,14 +2,21 @@
 
 A JavaScript client for [JustMatch API](https://github.com/justarrived/just_match_api).
 
-# Configuration
+## Install
 
-```JavaScript
-var Client = require('./src/client');
+```
+npm install --save just-match-client
+```
+
+## Usage
+
+```javascript
+var Client = require('just-match-client');
 
 var client = new Client({
   baseURL: 'http://localhost:3000',
-  __debug__: true
+  promoCode: 'xyz', // Optional
+  __debug__: true  // Toggle debugging output
 });
 
 // Get all jobs sorted by their updated at attribute
@@ -19,11 +26,14 @@ client.jobs.index().GET({sort: ['-updated-at']}).then(function(res) {
 
   for (var i = 0; i < data.length; i++) {
     job = data[i].attributes;
-    console.log(job['id'], job['name'], job['updated-at']);
+    console.log(data[i]['id'], job['name'], job['updated-at']);
   }
 });
 ```
 
-# Usage
+Fore more in depth examples see [`example.js`](example.js).
 
-See [`index.js`](index.js) for an example.
+## Todo
+
+* Implement convenience methods for `login`/`logout`
+* ...

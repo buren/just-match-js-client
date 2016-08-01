@@ -1,8 +1,13 @@
+'use strict';
+
 var Client = require('./src/client');
+var CacheStore = require('./src/cache-store');
 
 var client = new Client({
+  promoCode: 'justarrived',
   baseURL: 'http://localhost:3001',
-  __debug__: true
+  __debug__: true,
+  cache: new CacheStore()
 });
 
 var email = 'admin@example.com';
@@ -17,18 +22,8 @@ var data = {
   }
 };
 
-var logResp = function(res) {
+function logResponseError(res) {
   console.log('Logging', res.status, res.data);
-};
-
-var jobsSuccess = function(res) {
-  var data = res.data.data;
-  var job;
-
-  for (var i = 0; i < data.length; i++) {
-    job = data[i].attributes;
-    console.log(data[i]['id'], job['name'], job['updated-at']);
-  }
 };
 
 var imageSuccess = function(res) {
@@ -73,13 +68,13 @@ var userSuccess = function(res) {
   var images = relations['user-images'].data;
   var chats = relations['chats'].data;
 
-  client.languages.show(id).GET().then(langSuccess);
+  client.languages.show(id).GET().then(langSuccess, logResponseError);
   for (var i = 0; i < images.length; i++) {
-    client.users.draw(id).images.show(images[0].id).GET().then(imageSuccess, logResp);
+    client.users.draw(id).images.show(images[0].id).GET().then(imageSuccess, logResponseError);
   }
 
   for (var i = 0; i < chats.length; i++) {
-    client.users.draw(id).chats.show(chats[0].id).GET().then(chatSuccess, logResp);
+    client.users.draw(id).chats.show(chats[0].id).GET().then(chatSuccess, logResponseError);
   }
 
   console.log('EMAIL:', attributes['email']);
@@ -100,8 +95,29 @@ var sessionsSuccess = function(res) {
   client.setUserLocale(locale);
 
   console.log('LOCALE: ', locale);
-  client.users.show(userId).GET().then(userSuccess, logResp);
+  client.users.show(userId).GET().then(userSuccess, logResponseError);
+
+  // LOGOUT
+  // client.users.sessions.show(token).DELETE(data).then(function(res) {
+  //   console.log('LOGGED OUT', res);
+  // });
 };
 
-client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResp)
-client.users.sessions.index().POST(data).then(sessionsSuccess, logResp);
+var jobsSuccess = function(res) {
+  var data = res.data.data;
+  var job;
+  console.log('JOBS:');
+
+  for (var i = 0; i < data.length; i++) {
+    job = data[i].attributes;
+    console.log(data[i]['id'], job['name'], job['updated-at']);
+  }
+};
+
+
+client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponseError);
+// To demonstrate that the cache works, wait for the above response to finish
+setTimeout(function() {
+  client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponseError);
+}, 1000)
+client.users.sessions.index().POST(data).then(sessionsSuccess, logResponseError);

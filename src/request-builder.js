@@ -1,35 +1,53 @@
-var promiseRequest = function(request, route, params, cacheStore, cache) {
+'use strict';
+
+var Promise = require('promise/lib/es6-extensions');
+require('promise/lib/rejection-tracking').enable({ allRejections: true });
+
+var NullCacheStore = require('./null-cache-store');
+var nullCacheStore = new NullCacheStore()
+
+var identityFn = function(o) { return o; };
+
+var promiseRequest = function(request, route, params, parser, errorParser, cache) {
   return new Promise(function(resolve, reject) {
-    var store = cacheStore;
-    if (cache && store.fetch(route)) {
-      resolve({ data: store.fetch(route), status: 200 });
+    var data = cache.fetch(route);
+    if (data) {
+      resolve({ data: data, parsed: parser(data), status: 200 });
       return;
     }
 
     var success = function(data, status) {
-      if (store) {
-        store.set(route, data);
-      }
-      resolve({ data: data, status: status });
+      cache.set(route, data);
+      resolve({ data: data, parsed: parser(data), status: status });
     };
 
     var fail = function(data, status) {
-      reject({ data: data, status: status });
+      reject({ data: data, parsed: errorParser(data), status: status });
     };
 
     request(route, params, success, fail);
   });
 };
 
-var requestBuilder = function(route, getFn, postFn, cacheStore) {
+var requestBuilder = function(route, request, cache, parser, errParser) {
+  var successParser = parser || identityFn;
+  var errorParser = errParser || identityFn;
+
   return {
     name: route,
-    GET: function(params, cache) {
-      return promiseRequest(getFn, route, params, cacheStore, cache);
+    GET: function(params, fetchFromCache) {
+      var cacheStore = fetchFromCache ? cache : nullCacheStore;
+      return promiseRequest(request.get, route, params, successParser, errorParser, cacheStore);
     },
     POST: function(params) {
-      return promiseRequest(postFn, route, params);
+      return promiseRequest(request.post, route, params, successParser, errorParser, nullCacheStore);
     },
+    PATCH: function(params) {
+      return promiseRequest(request.patch, route, params, successParser, errorParser, nullCacheStore);
+    },
+    DELETE: function(params) {
+      return promiseRequest(request.delete, route, params, successParser, errorParser, nullCacheStore);
+    }
   }
 };
 

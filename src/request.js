@@ -1,39 +1,50 @@
+'use strict';
 var XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+
+var buildParams = require('./build-params');
+
+var BASE_URL = 'https://api.justarrived.se/api/v1';
+var STATUS = { COMPLETED: 4 };
 
 function noop() {};
 
-function onRequestError(_event) {
-  console.error('An error occurred during the transaction');
+function onRequestError(failFn) {
+  return function(data, status) {
+    console.error('An error occurred during the transaction');
+    return failFn({}, 500);
+  };
 };
 
-function buildFilerParams(filter) {
-  var builtFilter = [];
-  var value, paramName;
-
-  for (var name in filter) {
-    if (filter.hasOwnProperty(name)) {
-      value = filter[name];
-      paramName = 'filter[' + name + ']=';
-      builtFilter.push(encodeURIComponent(paramName + filter[name]));
-    }
-  }
-  return builtFilter.join('&');
-}
-
-function buildParams(params) {
-  var sort = 'sort=' + ((params || {}).sort || []).join(',');
-  var filter = buildFilerParams((params || {}).filter || []);
-
-  return [sort, filter].join('&');
-}
-
-function isSuccessStatus(status) {
+function isServerSuccessStatus(status) {
   return status >= 200 && status < 400;
+}
+
+function isServerErrorStatus(status) {
+  return status === 500 || status === 404 || status === 0;
+}
+
+function callResponse(response, success, fail) {
+  var status = response.status;
+  var data;
+  if (isServerSuccessStatus(status)) {
+    data = {};
+    // No content status and therefore no content to parse..
+    if (status !== 204) {
+      data = JSON.parse(response.responseText);
+    }
+    success(data, status);
+  } else if (isServerErrorStatus(status)) {
+    // Server error doesn't return valid JSON
+    fail({}, status);
+  } else {
+    // Validation/Authentication errors 422/401/403/413
+    fail(JSON.parse(response.responseText), status);
+  }
 }
 
 function Request(options) {
   var self = this;
-  self.baseURL = options.baseURL || 'https://api.justarrived.se/api/v1';
+  self.baseURL = options.baseURL || BASE_URL;
   self.promoCode = options.promoCode;
   self.userLocale = options.locale;
   self.userToken = options.userToken;
@@ -73,7 +84,7 @@ function Request(options) {
 
     var fullURL =  self.baseURL + url + '?' + buildParams(params);
     if (self.__debug__) {
-      console.log('REQUESTING URL: ', fullURL);
+      console.log('REQUEST URL: ', fullURL);
     }
 
     var request = new XMLHttpRequest();
@@ -81,24 +92,16 @@ function Request(options) {
     self.setRequestHeaders(request);
 
     request.onload = function() {
-      var data = JSON.parse(this.responseText);
-      var status = this.status;
-
-      if (isSuccessStatus(status)) {
-        success(data, status);
-      } else {
-        // Target server reached, but it returned an error
-        fail(data, status);
-      }
+      callResponse(this, success, fail);
     };
 
     // Connection error
-    request.onerror = onRequestError;
+    request.onerror = onRequestError(fail);
 
     request.send();
   };
 
-  self.post = function(url, data, success, fail) {
+  self.do = function(url, data, success, fail, verb) {
     success = success || noop;
     fail = fail || noop;
 
@@ -106,39 +109,38 @@ function Request(options) {
     var fullURL = self.baseURL + url;
 
     if (self.__debug__) {
-      console.log('POSTING TO URL: ', fullURL);
-      console.log('POSTING DATA: ', data);
+      console.log(verb + ' TO URL: ', fullURL);
+      console.log(verb + ' DATA: ', data);
     }
 
     request.onreadystatechange = function() {
-      // check if request has been completed
-      if (this.readyState !== 4) {
+      if (this.readyState !== STATUS.COMPLETED) {
         return;
       }
-
-      var status = this.status;
-      var data;
-
-      if (isSuccessStatus(status)) {
-        data = JSON.parse(this.responseText);
-        success(data, status);
-      } else {
-        // Server doesn't return JSON for 500 or 404 status
-        data = status === 500 || status === 404  ? {} : JSON.parse(this.responseText);
-        // Target server reached, but it returned an error
-        fail(data, status)
-      }
+      callResponse(this, success, fail);
     };
 
     // Connection error
-    request.onerror = onRequestError;
+    request.onerror = onRequestError(fail);
 
     request.withCredentials = true;
-    request.open('POST', fullURL);
+    request.open(verb, fullURL);
     self.setRequestHeaders(request);
     request.setRequestHeader('cache-control', 'no-cache');
 
     request.send(JSON.stringify(data));
+  };
+
+  self.post = function(url, data, success, fail) {
+    self.do(url, data, success, fail, 'POST');
+  };
+
+  self.patch = function(url, data, success, fail) {
+    self.do(url, data, success, fail, 'PATCH');
+  };
+
+  self.delete = function(url, data, success, fail) {
+    self.do(url, data, success, fail, 'DELETE');
   };
 };
 

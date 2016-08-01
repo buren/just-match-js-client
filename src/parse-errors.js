@@ -1,3 +1,5 @@
+'use strict';
+
 function buildError(error) {
   return {
     status: error.status,

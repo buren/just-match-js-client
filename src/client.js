@@ -1,11 +1,9 @@
+'use strict';
+
 var requestBuilder = require('./request-builder');
 var Request = require('./request');
-
-var NullCacheStore = {
-  store: {},
-  fetch: function(route) { return null; },
-  set: function(route, data) {}
-};
+var NullCacheStore = require('./null-cache-store');
+var Store = require('./store');
 
 function Sessions(client, base) {
   var name = base + '/sessions';
@@ -205,16 +203,16 @@ var Client = function(opts) {
   var defaultUrl = 'https://api.justarrived.se';
   var version = 'v1';
 
-  var options = {
+  var requestOptions = {
     baseURL: (opts.baseURL || defaultUrl) + '/api/' + version,
     locale: opts.locale || 'en',
+    promoCode: opts.promoCode,
     userToken: opts.userToken || null,
-    cache: opts.cache || NullCacheStore,
     __debug__: opts.__debug__ || false
   };
 
-  self.request = new Request(options);
-  self.cache = options.cache;
+  self.request = new Request(requestOptions);
+  self.cache = opts.cache || new NullCacheStore();
 
   self.jobs = Jobs(self, '', true);
   self.users = Users(self, '', true);
@@ -234,7 +232,7 @@ var Client = function(opts) {
     self.request.setUserLocale(locale);
   };
   self.requestBuilder = function(route) {
-    return requestBuilder(route, self.request.get, self.request.post, self.cache);
+    return requestBuilder(route, self.request, self.cache);
   };
 };
 
