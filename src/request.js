@@ -124,7 +124,7 @@ function Request(options) {
     request.onerror = onRequestError(fail);
 
     request.withCredentials = true;
-    request.open(verb, fullURL);
+    request.open(verb, fullURL, true);
     self.setRequestHeaders(request);
     request.setRequestHeader('cache-control', 'no-cache');
 

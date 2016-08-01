@@ -41,12 +41,15 @@ var langSuccess = function(res) {
   console.log('LANG:', attributes['en-name']);
 };
 
-var messageSuccess = function(res) {
-  console.log('messageSuccess');
+var messagesSuccess = function(res) {
   var data = res.data.data;
-  var attributes = data.attributes;
-
-  console.log('MESSAGE BODY', attributes.data);
+  var attributes;
+  console.log('=== MESSAGES START ===');
+  for (var i = 0; i < data.length; i++) {
+    attributes = data[i].attributes;
+    console.log('MESSAGE BODY:', attributes.body.substr(0, 50));
+  }
+  console.log('=== MESSAGES END ===');
 }
 
 var chatSuccess = function(res) {
@@ -57,6 +60,7 @@ var chatSuccess = function(res) {
   var messages = relations.messages.data;
 
   console.log('MESSAGES LEN', messages.length);
+  client.chats.draw(id).messages.index().GET().then(messagesSuccess);
 };
 
 var userSuccess = function(res) {
@@ -74,7 +78,7 @@ var userSuccess = function(res) {
   }
 
   for (var i = 0; i < chats.length; i++) {
-    client.users.draw(id).chats.show(chats[0].id).GET().then(chatSuccess, logResponseError);
+    client.users.draw(id).chats.show(chats[i].id).GET().then(chatSuccess, logResponseError);
   }
 
   console.log('EMAIL:', attributes['email']);
