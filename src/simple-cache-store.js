@@ -1,6 +1,6 @@
 'use strict';
 
-var CacheStore = function() {
+var SimpleCacheStore = function() {
   var self = this;
   self.store = {};
 
@@ -20,4 +20,4 @@ var CacheStore = function() {
   };
 };
 
-module.exports = CacheStore;
+module.exports = SimpleCacheStore;

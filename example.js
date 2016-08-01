@@ -1,7 +1,8 @@
 'use strict';
 
 var Client = require('./src/client');
-var CacheStore = require('./src/cache-store');
+// var CacheStore = require('./src/simple-cache-store');
+var CacheStore = require('./src/jsonapi-cache-store');
 
 var client = new Client({
   promoCode: 'justarrived',
@@ -22,7 +23,7 @@ var data = {
   }
 };
 
-function logResponseError(res) {
+function logResponse(res) {
   console.log('Logging', res.status, res.data);
 };
 
@@ -72,13 +73,13 @@ var userSuccess = function(res) {
   var images = relations['user-images'].data;
   var chats = relations['chats'].data;
 
-  client.languages.show(id).GET().then(langSuccess, logResponseError);
+  client.languages.show(id).GET().then(langSuccess, logResponse);
   for (var i = 0; i < images.length; i++) {
-    client.users.draw(id).images.show(images[0].id).GET().then(imageSuccess, logResponseError);
+    client.users.draw(id).images.show(images[0].id).GET().then(imageSuccess, logResponse);
   }
 
   for (var i = 0; i < chats.length; i++) {
-    client.users.draw(id).chats.show(chats[i].id).GET().then(chatSuccess, logResponseError);
+    client.users.draw(id).chats.show(chats[i].id).GET().then(chatSuccess, logResponse);
   }
 
   console.log('EMAIL:', attributes['email']);
@@ -99,7 +100,7 @@ var sessionsSuccess = function(res) {
   client.setUserLocale(locale);
 
   console.log('LOCALE: ', locale);
-  client.users.show(userId).GET().then(userSuccess, logResponseError);
+  client.users.show(userId).GET().then(userSuccess, logResponse);
 
   // LOGOUT
   // client.users.sessions.show(token).DELETE(data).then(function(res) {
@@ -110,18 +111,16 @@ var sessionsSuccess = function(res) {
 var jobsSuccess = function(res) {
   var data = res.data.data;
   var job;
-  console.log('JOBS:');
-
+  console.log('=== JOBS START ===');
   for (var i = 0; i < data.length; i++) {
     job = data[i].attributes;
     console.log(data[i]['id'], job['name'], job['updated-at']);
   }
+  console.log('=== JOBS END ===');
+
+  // To demonstrate that the cache works, make the same request again (no request should be logged)
+  client.jobs.index().GET({sort: ['-updated-at']}, true);
 };
 
-
-client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponseError);
-// To demonstrate that the cache works, wait for the above response to finish
-setTimeout(function() {
-  client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponseError);
-}, 1000)
-client.users.sessions.index().POST(data).then(sessionsSuccess, logResponseError);
+client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponse);
+client.users.sessions.index().POST(data).then(sessionsSuccess, logResponse);

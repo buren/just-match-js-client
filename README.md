@@ -19,8 +19,7 @@ var client = new Client({
   __debug__: true  // Toggle debugging output
 });
 
-// Get all jobs sorted by their updated at attribute
-client.jobs.index().GET({sort: ['-updated-at']}).then(function(res) {
+var success = function(res) {
   var data = res.data.data;
   var job;
 
@@ -28,7 +27,15 @@ client.jobs.index().GET({sort: ['-updated-at']}).then(function(res) {
     job = data[i].attributes;
     console.log(data[i]['id'], job['name'], job['updated-at']);
   }
-});
+};
+
+var fail = function(res) {
+  console.error('Something went wrong!');
+}
+
+// Get all jobs sorted by their updated-at attribute
+client.jobs.index().GET({sort: ['-updated-at']})
+  .then(success, fail);
 ```
 
 Fore more in depth examples see [`example.js`](example.js).

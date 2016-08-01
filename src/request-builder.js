@@ -8,47 +8,44 @@ var nullCacheStore = new NullCacheStore()
 
 var identityFn = function(o) { return o; };
 
-var promiseRequest = function(request, route, params, parser, errorParser, cache) {
+var promiseRequest = function(request, route, params, cache) {
   return new Promise(function(resolve, reject) {
     var data = cache.fetch(route);
     if (data) {
-      resolve({ data: data, parsed: parser(data), status: 200 });
+      resolve({ data: data, status: 200 });
       return;
     }
 
     var success = function(data, status) {
       cache.set(route, data);
-      resolve({ data: data, parsed: parser(data), status: status });
+      resolve({ data: data, status: status });
     };
 
     var fail = function(data, status) {
-      reject({ data: data, parsed: errorParser(data), status: status });
+      reject({ data: data, status: status });
     };
 
     request(route, params, success, fail);
   });
 };
 
-var requestBuilder = function(route, request, cache, parser, errParser) {
-  var successParser = parser || identityFn;
-  var errorParser = errParser || identityFn;
-
+var requestBuilder = function(route, request, cache) {
   return {
     name: route,
     GET: function(params, fetchFromCache) {
       var cacheStore = fetchFromCache ? cache : nullCacheStore;
-      return promiseRequest(request.get, route, params, successParser, errorParser, cacheStore);
+      return promiseRequest(request.get, route, params, cacheStore);
     },
     POST: function(params) {
-      return promiseRequest(request.post, route, params, successParser, errorParser, nullCacheStore);
+      return promiseRequest(request.post, route, params, nullCacheStore);
     },
     PATCH: function(params) {
-      return promiseRequest(request.patch, route, params, successParser, errorParser, nullCacheStore);
+      return promiseRequest(request.patch, route, params, nullCacheStore);
     },
     DELETE: function(params) {
-      return promiseRequest(request.delete, route, params, successParser, errorParser, nullCacheStore);
+      return promiseRequest(request.delete, route, params, nullCacheStore);
     }
-  }
+  };
 };
 
 module.exports = requestBuilder;

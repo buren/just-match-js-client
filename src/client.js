@@ -3,7 +3,10 @@
 var requestBuilder = require('./request-builder');
 var Request = require('./request');
 var NullCacheStore = require('./null-cache-store');
-var Store = require('./store');
+
+var DEFAULT_URL = 'https://api.justarrived.se';
+var DEFAULT_LOCALE = 'en';
+var API_VERSION = 'v1';
 
 function Sessions(client, base) {
   var name = base + '/sessions';
@@ -134,11 +137,14 @@ var Chats = function(client, base, deep) {
 };
 
 var Jobs = function(client, base, deep) {
-  var name = base + '/jobs';
+  var type = 'jobs';
+  var name = base + '/' + type;
 
   var baseRoutes = {
     index: function() { return client.requestBuilder(name); },
-    show: function(id) { return client.requestBuilder(name + '/' + id); }
+    show: function(id) {
+      return client.requestBuilder(name + '/' + id);
+    }
   };
 
   if (!deep) {
@@ -166,7 +172,7 @@ var Users = function(client, base, deep) {
 
   var baseRoutes = {
     index: function() { return client.requestBuilder(name); },
-    show: function(id) { return client.requestBuilder(name + '/' + id); },
+    show: function(id) { return client.requestBuilder(name + '/' + id); }
   };
 
   if (!deep) {
@@ -200,12 +206,10 @@ var Users = function(client, base, deep) {
 
 var Client = function(opts) {
   var self = this;
-  var defaultUrl = 'https://api.justarrived.se';
-  var version = 'v1';
 
   var requestOptions = {
-    baseURL: (opts.baseURL || defaultUrl) + '/api/' + version,
-    locale: opts.locale || 'en',
+    baseURL: (opts.baseURL || DEFAULT_URL) + '/api/' + API_VERSION,
+    locale: opts.locale || DEFAULT_LOCALE,
     promoCode: opts.promoCode,
     userToken: opts.userToken || null,
     __debug__: opts.__debug__ || false
