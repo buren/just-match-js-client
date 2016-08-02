@@ -29,9 +29,8 @@ job.show().GET({ include: ['owner', 'comments', 'language'] }).then(function(res
   var job = res.data;
   var comment = job.comments[0];
   var success = function(res) {
-    console.log(comment.language['en-name']);
+    console.log(comment.language.enName);
   };
-  console.log(comment.language['en-name']);
   promiseModel(comment.language, client.languages).then(success);
 });
 

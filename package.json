@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/buren/just-match-js-client#readme",
   "dependencies": {
+    "humps": "^1.1.0",
     "jsonapi-datastore": "^0.4.0-beta",
     "promise": "^7.1.1",
     "xmlhttprequest": "^1.8.0"
