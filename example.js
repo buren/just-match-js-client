@@ -4,6 +4,9 @@ var Client = require('./lib/client')
 var JSONAPIStore = require('./lib/jsonapi-store')
 var promiseModel = require('./lib/promise-model')
 
+var Promise = require('promise/lib/es6-extensions')
+require('promise/lib/rejection-tracking').enable({ allRejections: true })
+
 var client = new Client({
   promoCode: 'justarrived',
   baseURL: 'http://localhost:3001',
@@ -80,12 +83,27 @@ var sessionsSuccess = function(res) {
 var jobsSuccess = function(res) {
   var jobs = res.data
   jobs.map(function(job) {
-    console.log(job.id, job.name, job.updatedAt)
+    console.log(job.owner.firstName, 'created', job.name, 'last created at', job.createdAt.substr(0, 10))
   })
 
   // To demonstrate that the cache works, make the same request again (no request should be logged)
-  client.jobs.index().GET({sort: ['-updated-at']}, true)
+  client.jobs.index().GET({ sort: ['-updated-at'], include: ['owner'] }, true)
 }
 
-client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponse)
-client.users.sessions.index().POST(sessionData).then(sessionsSuccess, logResponse)
+// client.jobs.index().GET({ sort: ['-updated-at'], include: ['owner'] }).then(jobsSuccess, logResponse)
+// client.users.sessions.index().POST(sessionData).then(sessionsSuccess, logResponse)
+
+var jobId = 1;
+var jobPage = client.jobs.draw(jobId);
+console.log('page', jobPage)
+Promise.all([
+  jobPage.show().GET({ include: ['owner'] }),
+  jobPage.comments.index().GET(),
+  jobPage.skills.index().GET()
+]).then(function() {
+  var store = client.store
+  var job = store.find('jobs', jobId)
+  console.log(job.owner.firstName, 'created', job.name, 'last created at', job.createdAt.substr(0, 10))
+
+  console.log('=== All done ===')
+})
