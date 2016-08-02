@@ -11,7 +11,7 @@ var client = new Client({
   store: new JSONAPIStore()
 });
 
-var job = client.jobs.draw(1);
+var jobPage = client.jobs.draw(1);
 
 var proccessComments = function(res) {
   var comments = res.data;
@@ -24,14 +24,16 @@ var jobPageData = function(res) {
   job.comments.index().GET().then(proccessComments);
 }
 
-job.show().GET({ include: ['owner', 'comments'] }).then(jobPageData);
-job.show().GET({ include: ['owner', 'comments', 'language'] }).then(function(res) {
+// job.show().GET({ include: ['owner', 'comments'] }).then(jobPageData);
+jobPage.show().GET({ include: ['owner', 'comments', 'language'] }).then(function(res) {
   var job = res.data;
   var comment = job.comments[0];
   var success = function(res) {
     console.log(comment.language.enName);
   };
   promiseModel(comment.language, client.languages).then(success);
+  console.log('owner name:', job.owner.firstName, 'description:', job.owner.description);
+
 });
 
 // client.jobs.index().GET({size: 1, page: 21}).then(function(res) {
