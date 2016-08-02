@@ -1,14 +1,14 @@
 'use strict';
 
-var Client = require('./src/client');
-// var CacheStore = require('./src/simple-cache-store');
-var CacheStore = require('./src/jsonapi-cache-store');
+var Client = require('./lib/client');
+// var Store = require('./lib/simple-cache-store');
+var Store = require('./lib/jsonapi-store');
 
 var client = new Client({
   promoCode: 'justarrived',
   baseURL: 'http://localhost:3001',
   __debug__: true,
-  cache: new CacheStore()
+  cache: new Store()
 });
 
 var email = 'admin@example.com';
@@ -120,6 +120,7 @@ var jobsSuccess = function(res) {
 
   // To demonstrate that the cache works, make the same request again (no request should be logged)
   client.jobs.index().GET({sort: ['-updated-at']}, true);
+  console.log('STORE LENGTH', client.cache.findAll('jobs').length);
 };
 
 client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponse);

@@ -12,33 +12,48 @@ npm install --save just-match-client
 
 ```javascript
 var Client = require('just-match-client');
+var JsonApiStore = require('just-match-client/jsonapi-store');
 
 var client = new Client({
   baseURL: 'http://localhost:3000',
   promoCode: 'xyz', // Optional
   __debug__: true  // Toggle debugging output
+  store: new JsonApiStore() // JSONAPI Storage
 });
 
 var success = function(res) {
-  var data = res.data.data;
-  var job;
+  var jobs = res.data;
 
-  for (var i = 0; i < data.length; i++) {
-    job = data[i].attributes;
-    console.log(data[i]['id'], job['name'], job['updated-at']);
+  for (var i = 0; i < jobs.length; i++) {
+    var job = data[i];
+    console.log(job].id, job.name, job['updated-at']);
   }
 };
 
-var fail = function(res) {
-  console.error('Something went wrong!');
-}
-
 // Get all jobs sorted by their updated-at attribute
 client.jobs.index().GET({sort: ['-updated-at']})
-  .then(success, fail);
+  .then(success);
 ```
 
 Fore more in depth examples see [`example.js`](example.js).
+
+## Docs
+
+__Stores__
+
+Follows a simple protocol:
+
+```javascript
+var IdentityStore = function() {
+  this.store = {},
+  this.fetch = function(route) { return null; };
+  this.set = function(route, data) { return data; };
+  this.error = function(data) { return data; };
+};
+
+module.exports = IdentityStore;
+```
+
 
 ## Todo
 
