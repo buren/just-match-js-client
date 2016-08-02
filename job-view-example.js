@@ -15,9 +15,9 @@ var jobPage = client.jobs.draw(1);
 
 var proccessComments = function(res) {
   var comments = res.data;
-  for (var i = 0; i < comments.length; i++) {
+  comments.map(function(comment) {
     console.log('COMMENT BODY:', comments[i].body);
-  }
+  });
 };
 
 var jobPageData = function(res) {
@@ -36,6 +36,9 @@ jobPage.show().GET({ include: ['owner', 'comments', 'language'] }).then(function
 
 });
 
-// client.jobs.index().GET({size: 1, page: 21}).then(function(res) {
-//   console.log('DATA', res.data);
-// })
+client.jobs.index().GET({size: 3}).then(function(res) {
+  var jobs = res.data;
+  jobs.map(function(job) {
+    console.log('JOB', job.id, job.name);
+  });
+});

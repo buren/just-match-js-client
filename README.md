@@ -23,11 +23,9 @@ var client = new Client({
 
 var success = function(res) {
   var jobs = res.data;
-
-  for (var i = 0; i < jobs.length; i++) {
-    var job = data[i];
-    console.log(job].id, job.name, job['updated-at']);
-  }
+  jobs.map(function(job) {
+    console.log(job.id, job.name, job.updatedAt);
+  });
 };
 
 // Get all jobs sorted by their updated-at attribute

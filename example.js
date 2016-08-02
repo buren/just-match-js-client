@@ -1,7 +1,6 @@
 'use strict';
 
 var Client = require('./lib/client');
-// var Store = require('./lib/simple-cache-store');
 var JSONAPIStore = require('./lib/jsonapi-store');
 var promiseModel = require('./lib/promise-model');
 
@@ -36,19 +35,17 @@ var userSuccess = function(res) {
   promiseModel(user.language, client.languages).then(function(res) {
     var lang = res.data;
     console.log('USER LANG:', lang.enName);
-  })
+  });
 
   userPage.chats.index().GET({include: ['messages']}).then(function(res) {
     var chats = res.data;
-
     console.log('Chats len', chats.length);
-    for (var i = 0; i < chats.length; i++) {
-      var chat = chats[i];
+    chats.map(function(chat) {
       console.log('chat msg len', chat.messages.length);
-      for (var i = 0; i < chat.messages.length; i++) {
-        var message = chat.messages[i];
-      }
-    }
+      chat.messages.map(function(message) {
+        return message.body;
+      })
+    })
   });
 };
 
@@ -64,14 +61,13 @@ var sessionsSuccess = function(res) {
   console.log('LOCALE: ', locale);
   client.users.show(userId).GET().then(userSuccess, logResponse);
 
-
   var jobPage = client.jobs.draw(1);
   jobPage.show().GET().then(function(res) {
     jobPage.jobUsers.index().GET().then(function(res) {
-      for (var i = 0; i < res.data.length; i++) {
-        var jobUser = res.data[i];
-        // ..
-      }
+      var jobUsers = res.data;
+      jobUsers.map(function(jobUser) {
+        console.log('jobUser#willPerform', jobUser.willPerform);
+      });
     });
   });
 
@@ -82,18 +78,15 @@ var sessionsSuccess = function(res) {
 };
 
 var jobsSuccess = function(res) {
-  var data = res.data.data;
-  var job;
+  var jobs = res.data;
   console.log('=== JOBS START ===');
-  for (var i = 0; i < data.length; i++) {
-    job = data[i].attributes;
-    console.log(data[i]['id'], job['name'], job['updated-at']);
-  }
+  jobs.map(function(job) {
+    console.log(job.id, job.name, job.updatedAt);
+  });
   console.log('=== JOBS END ===');
 
   // To demonstrate that the cache works, make the same request again (no request should be logged)
   client.jobs.index().GET({sort: ['-updated-at']}, true);
-  console.log('STORE LENGTH', client.cache.findAll('jobs').length);
 };
 
 client.jobs.index().GET({sort: ['-updated-at']}, true).then(jobsSuccess, logResponse);
