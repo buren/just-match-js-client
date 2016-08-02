@@ -93,7 +93,7 @@ Promise.all([
 })
 ```
 
-Fore more in depth examples see [`example.js`](example.js) and [job-view-example.js](job-view-example.js).
+For more in depth examples see [`example.js`](example.js) and [job-view-example.js](job-view-example.js).
 
 ## Parameters
 
@@ -116,9 +116,9 @@ All JSONAPI parameters are supported and you can pass to them to any request (th
 
 :warning: If you're looking for "batteries included" then checkout `JSONAPIStore` below.
 
-Stores are a mechanism to cache and parse data returned from the client. Currently there are three stores available (see further below).
+Stores are a mechanism to cache and parse data returned from the client. Currently there are three stores available.
 
-They must follow a simple protocol. The simplest store available is the `IdentityStore`, no data is cached and no parsing is done.
+The simplest store available is the `IdentityStore`, no data is cached and no parsing is done.
 
 ```javascript
 var IdentityStore = function() {
@@ -131,9 +131,7 @@ var IdentityStore = function() {
 module.exports = IdentityStore
 ```
 
-There are also two other stores, `SimpleStore` and `JSONAPIStore`.
-
-SimpleStore is `IdentityStore` with add caching.
+`SimpleStore` is `IdentityStore` with caching.
 
 `JSONAPIStore` is more full fledged and provides both caching and parsing. It enables you to each response as model objects, as seen in the [examples](#examples) above.
 
