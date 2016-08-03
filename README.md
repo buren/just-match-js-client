@@ -133,7 +133,7 @@ module.exports = IdentityStore
 
 `SimpleStore` is `IdentityStore` with caching.
 
-`JSONAPIStore` is more full fledged and provides both caching and parsing. It enables you to each response as model objects, as seen in the [examples](#examples) above.
+`JSONAPIStore` is more full fledged and provides both caching and parsing. It enables you to each response as model objects, as seen in the examples above.
 
 ## Todo
 
