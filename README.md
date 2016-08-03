@@ -101,6 +101,17 @@ var client = new Client({
 })
 ```
 
+__Custom store (see details below)__:
+
+```javascript
+var Client = require('just-match-client')
+
+var client = new Client({
+ store: new IdentityStore()
+})
+```
+
+
 For more in depth examples see [`example.js`](example.js) and [job-view-example.js](job-view-example.js).
 
 ## Parameters
