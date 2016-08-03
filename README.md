@@ -145,5 +145,11 @@ module.exports = IdentityStore
 
 ## Todo
 
+* Generate a good, and lightweight, browser build
 * Implement convenience methods for `login`/`logout`
+* Return meta data `promise-request`
+* Client data store
+  - Delete data
+  - Check when data was written to cache
+* Consider auto setting/deleting client user token, on session requests (to implicit?)
 * ...
