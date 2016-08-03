@@ -1,9 +1,7 @@
 var Client = require('./lib/client')
-var Store = require('./lib/store')
-var JSONAPIStore = require('./lib/jsonapi-store')
+var JSONAPIStore = require('./lib/stores/jsonapi-store')
 var promiseModel = require('./lib/promise-model')
 
-var store = new Store()
 var client = new Client({
   promoCode: 'justarrived',
   baseURL: 'http://localhost:3001',

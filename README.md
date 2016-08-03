@@ -14,12 +14,10 @@ __Setup__
 
 ```javascript
 var Client = require('just-match-client')
-var JsonApiStore = require('just-match-client/jsonapi-store')
 
 var client = new Client({
   baseURL: 'http://localhost:3000',
   promoCode: 'xyz', // Optional
-  store: new JsonApiStore(), // JSONAPI Storage
   __debug__: true  // Toggle debugging output
 })
 ```
@@ -93,6 +91,16 @@ Promise.all([
 })
 ```
 
+__Custom store (see details below)__:
+
+```javascript
+var Client = require('just-match-client')
+
+var client = new Client({
+  store: new IdentityStore()
+})
+```
+
 For more in depth examples see [`example.js`](example.js) and [job-view-example.js](job-view-example.js).
 
 ## Parameters
@@ -114,7 +122,7 @@ All JSONAPI parameters are supported and you can pass to them to any request (th
 
 ## Stores
 
-:warning: If you're looking for "batteries included" then checkout `JSONAPIStore` below.
+__Default store__: `JSONAPIStore`
 
 Stores are a mechanism to cache and parse data returned from the client. Currently there are three stores available.
 

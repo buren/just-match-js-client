@@ -2,7 +2,7 @@
   "name": "just-match-client",
   "version": "0.1.1",
   "description": "Client for JustMatch API",
-  "main": "src/client.js",
+  "main": "lib/index.js",
   "scripts": {
     "start": "node example.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,5 +29,16 @@
     "jsonapi-datastore": "^0.4.0-beta",
     "promise": "^7.1.1",
     "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
+    "babelify": "^7.3.0",
+    "browserify": "^13.1.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-sourcemaps": "^1.6.0",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.7.0"
   }
 }

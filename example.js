@@ -1,7 +1,7 @@
 'use strict'
 
 var Client = require('./lib/client')
-var JSONAPIStore = require('./lib/jsonapi-store')
+var JSONAPIStore = require('./lib/stores/jsonapi-store')
 var promiseModel = require('./lib/promise-model')
 
 var Promise = require('promise/lib/es6-extensions')
@@ -10,8 +10,7 @@ require('promise/lib/rejection-tracking').enable({ allRejections: true })
 var client = new Client({
   promoCode: 'justarrived',
   baseURL: 'http://localhost:3001',
-  __debug__: true,
-  store: new JSONAPIStore()
+  __debug__: true
 })
 
 var email = 'admin@example.com'
@@ -107,3 +106,5 @@ Promise.all([
 
   console.log('=== All done ===')
 })
+
+JSONAPIStore
