@@ -1,6 +1,8 @@
-# JustMatch API Client
+# JustMatch API Client (alpha)
 
 A JavaScript client for [JustMatch API](https://github.com/justarrived/just_match_api).
+
+:warning: This is still in alpha and under development. The public APIs may change at any moment and its not 100% feature complete, yet... Any feedback and/or bug reports are more than welcome!
 
 ## Install
 
