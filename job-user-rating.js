@@ -20,7 +20,7 @@ function parseJobUsers(jobUsers) {
 
   for (var i = 0; i < jobUsers.length; i++) {
     var jobUser = jobUsers[i]
-    console.log(jobUser.id, jobUser.accepted, jobUser.willPerform, jobUser.performed)
+    console.log('job-user', jobUser.id, jobUser.accepted, jobUser.willPerform, jobUser.performed)
     parseRatings(jobUser.ratings)
   }
 }
@@ -29,7 +29,7 @@ function parseComments(comments) {
   if (!comments) return
   for (var i = 0; i < comments.length; i++) {
     var comment = comments[i]
-    console.log(comment.id, comment.body)
+    console.log('comment ', comment.id, comment.body)
   }
 }
 
@@ -46,7 +46,7 @@ function doIt() {
     jobPage.comments.index().GET()
   ]).then(function() {
     var job = client.store.find('jobs', jobId)
-    console.log(job.id, job.name)
+    console.log('job', job.id, job.name)
     parseComments(job.comments)
     parseJobUsers(job.jobUsers)
   })
