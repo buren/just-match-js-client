@@ -68,5 +68,5 @@ client.users.sessions.index().POST({
 
   doIt();
 }, function(res) {
-  console.log('ERROR', JSON.stringify(res));
+  console.log('ERROR', JSON.stringify(res))
 })
