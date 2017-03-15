@@ -2,7 +2,7 @@
 
 A JavaScript client for [JustMatch API](https://github.com/justarrived/just_match_api).
 
-:warning: This is still in alpha and under development. The public APIs may change at any moment and its not 100% feature complete, yet... Any feedback and/or bug reports are more than welcome!
+:warning: This is just a toy/experiment implementation to test a few ideas... If you have feedback or ideas, please create an issue they're more than welcome! :smile:
 
 ## Install
 
